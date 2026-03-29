@@ -1,3 +1,6 @@
+def GenerateKey():
+  deleteMe = True
+
 def GeneratePrime(num):
   if num == 1:
     return 9345770617
