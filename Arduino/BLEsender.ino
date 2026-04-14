@@ -1,7 +1,6 @@
 #include <ArduinoBLE.h>
 
-// Create a BLE service and characteristic
-BLEService dataService("180C");  // Custom service UUID
+BLEService dataService("180C");
 
 BLEIntCharacteristic dataCharacteristic("2A56", BLERead | BLENotify);
 
@@ -43,7 +42,6 @@ void loop() {
     while (central.connected()) {
       counter++;
 
-      // Send value via BLE
       dataCharacteristic.writeValue(counter);
 
       Serial.print("Sent: ");
