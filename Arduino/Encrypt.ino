@@ -1,5 +1,2 @@
-void setup() {
-}
-
-void loop() {
+void Encrypt() {
 }
