@@ -1,6 +1,5 @@
 def main():
-  deleteMe = true
+  deleteMe = True
 
 if __name__ == "__main__":
   main()
-  return

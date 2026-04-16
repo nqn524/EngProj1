@@ -6,5 +6,5 @@ def GeneratePrime(num):
     return 9345770617
   elif num == 2:
     return 6365097881
-  else
+  else:
     return 0
