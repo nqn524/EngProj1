@@ -1,2 +1,2 @@
 def FFT(data):
-  deleteMe = true
+  deleteMe = True

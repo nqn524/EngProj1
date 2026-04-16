@@ -1,2 +1,2 @@
 def GraphData(data):
-  deleteMe = true
+  deleteMe = True

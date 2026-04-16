@@ -1,2 +1,2 @@
 def GeneratePrime():
-  deleteMe = true
+  deleteMe = True
