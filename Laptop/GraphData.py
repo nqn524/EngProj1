@@ -13,11 +13,13 @@ def SetupGraphs():
     fig = plt.figure()
     axs = fig.add_subplot(2,1,1)
 
-    plt.title = "x"
+    axs.set_title("x")
+    
+    axs.plot([1,2,3,4,5], [1,4,9,16,25])
+    axs.plot([1,2,3,4,5], [25,16,9,4,1])
+    axs.plot([1,2,3,4,5], [25,1,4,16,9])
 
-    plt.plot([1,2,3,4,5], [1,4,9,16,25])
-    plt.plot([1,2,3,4,5], [25,16,9,4,1])
-    plt.plot([1,2,3,4,5], [25,1,4,16,9])
+    axs.clear()
 
     plt.show()
 
@@ -48,12 +50,19 @@ def GraphData(axs, x, y, z):
 
     t = np.linspace(0, (n - 1) * (1.0/Freq), n) 
     print(t)
+    
+    plt.close()
    
     axs.clear()
 
     axs.plot(t.tolist(), x)
     axs.plot(t.tolist(), y)
     axs.plot(t.tolist(), z)
+
+    plt.show()
+
+
+    
 
     
 
