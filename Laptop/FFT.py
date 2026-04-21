@@ -1,7 +1,11 @@
-import numpy.fft as fft
+import numpy as np
 
-def FFT(data):
-  
+def FFT(data, FREQ):
+    vlaues = np.abs(np.fft.rfft(data))
+    freqs = np.fft.rfftfreq(len(data), 1/FREQ)
+
+    return freqs, vlaues
 
 
-  deleteMe = True
+if __name__ == "__main__":
+    print()
