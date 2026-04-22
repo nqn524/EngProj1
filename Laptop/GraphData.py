@@ -25,6 +25,10 @@ NUM_OF_REC_SAMPS = int(FREQ * 2)
 
 SAMPLES = int(FREQ * 15)
 
+
+TIME_BETWEEN_RENDERS = 0.5
+samplesSinceLastRender = 0
+
 def _generate_array(n, TD):
     start = TD - (SAMPLES - n) * TD
     t = start + np.arange(SAMPLES) * TD
@@ -56,8 +60,8 @@ def SetupGraphs(x, y, z):
 
     fig, axs = plt.subplots(2,2)
     
-    #mng = plt.get_current_fig_manager()
-    #mng.window.state('zoomed')
+    mng = plt.get_current_fig_manager()
+    mng.window.state('zoomed')
     
     # Create a single line and keep reference
     axs[0,0].plot(t, xData, label="X", color="red")
@@ -123,43 +127,50 @@ def GraphData(axs, x, y, z):
 
     t.append(t[-1] + 1.0/FREQ)
 
+    global samplesSinceLastRender
+
+    if (samplesSinceLastRender < TIME_BETWEEN_RENDERS * FREQ):
+        samplesSinceLastRender += 1
+    else:
+        samplesSinceLastRender = 0
+
+        linesRaw = axs[0,0].get_lines()
+        linesRecent = axs[1,0].get_lines()
+
+        linesRaw[0].set_ydata(xData)
+        linesRaw[1].set_ydata(yData)
+        linesRaw[2].set_ydata(zData)
+
+        linesRecent[0].set_ydata(xRecent)
+        linesRecent[1].set_ydata(yRecent)
+        linesRecent[2].set_ydata(zRecent)
 
 
-    linesRaw = axs[0,0].get_lines()
-    linesRecent = axs[1,0].get_lines()
 
-    linesRaw[0].set_ydata(xData)
-    linesRaw[1].set_ydata(yData)
-    linesRaw[2].set_ydata(zData)
+        linesRaw[0].set_xdata(t)
+        linesRaw[1].set_xdata(t)
+        linesRaw[2].set_xdata(t)
 
-    linesRecent[0].set_ydata(xRecent)
-    linesRecent[1].set_ydata(yRecent)
-    linesRecent[2].set_ydata(zRecent)
+        linesRecent[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        linesRecent[1].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        linesRecent[2].set_xdata(t[-NUM_OF_REC_SAMPS:])
 
 
+        axs[0,0].relim()
+        axs[0,0].autoscale_view()
 
-    linesRaw[0].set_xdata(t)
-    linesRaw[1].set_xdata(t)
-    linesRaw[2].set_xdata(t)
+        axs[1,0].relim()
+        axs[1,0].autoscale_view()
 
-    linesRecent[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
-    linesRecent[1].set_xdata(t[-NUM_OF_REC_SAMPS:])
-    linesRecent[2].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        axs[0,1].relim()
+        axs[0,1].autoscale_view()
 
-    
-    axs[0,0].relim()
-    axs[0,0].autoscale_view()
+        axs[1,1].relim()
+        axs[1,1].autoscale_view()
 
-    axs[1,0].relim()
-    axs[1,0].autoscale_view()
+        plt.pause(0.001)
 
-    axs[0,1].relim()
-    axs[0,1].autoscale_view()
 
-    axs[1,1].relim()
-    axs[1,1].autoscale_view()
-
-    plt.pause(0.001)
 
 
     
@@ -170,7 +181,7 @@ if __name__ == "__main__":
     #           (np.linspace(0, (20 - 1) * 1.0/24.0, 20) + np.random.randn(20) * 0.1).tolist(), 
     #           (np.linspace(0, (20 - 1) * 1.0/24.0, 20) + np.random.randn(20) * 0.1).tolist())
 
-    noiseAmp = 0.5
+    noiseAmp = 0.00
 
     xAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 2 * t2) + np.sin(2 * np.pi * 3 * t2) + np.random.randn(SAMPLES) * noiseAmp)
     yAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 3 * t2) + np.sin(2 * np.pi * 5 * t2) + np.random.randn(SAMPLES) * noiseAmp)
@@ -180,14 +191,23 @@ if __name__ == "__main__":
 
     axs = SetupGraphs([],[],[])
 
-    print(len(xAccel))
-
     
-    freqX, magX = FFT.FFT(xAccel, FREQ)
-    fftx = FFT.FFT(yAccel, FREQ)
-    fftx = FFT.FFT(zAccel, FREQ)
+    magX, freqX = FFT.FFT(xAccel, FREQ)
+    magY, freqY = FFT.FFT(yAccel, FREQ)
+    magZ, freqZ = FFT.FFT(zAccel, FREQ)
 
-    axs[1,1].stem(freqX, magX)
+    markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
+    markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
+    markLineZ, stemLineZ, _ = axs[1,1].stem(freqZ, magZ, label="Z")
+
+    plt.setp(markLineX, color="red")
+    plt.setp(stemLineX, color="red")
+
+    plt.setp(markLineY, color="green")
+    plt.setp(stemLineY, color="green")
+
+    plt.setp(markLineZ, color="blue")
+    plt.setp(stemLineZ, color="blue")
     
 
 
@@ -201,6 +221,8 @@ if __name__ == "__main__":
         GraphData(axs, xAccel[index], yAccel[index], zAccel[index])
 
         index += 1
+
+        time.sleep(1/FREQ)
 
 
     #GraphData(axs, 1, 2, 3)
