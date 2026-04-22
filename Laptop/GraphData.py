@@ -85,6 +85,9 @@ def SetupGraphs(x, y, z):
 
     axs[1,1].set_xlabel("Freq")
     #axs[1,1].set_ylabel("Amplitude")
+
+    plt.ion()
+    plt.show(block=False)
     
     return axs
 
@@ -156,6 +159,8 @@ def GraphData(axs, x, y, z):
     axs[1,1].relim()
     axs[1,1].autoscale_view()
 
+    plt.pause(0.001)
+
 
     
 
@@ -165,7 +170,7 @@ if __name__ == "__main__":
     #           (np.linspace(0, (20 - 1) * 1.0/24.0, 20) + np.random.randn(20) * 0.1).tolist(), 
     #           (np.linspace(0, (20 - 1) * 1.0/24.0, 20) + np.random.randn(20) * 0.1).tolist())
 
-    noiseAmp = 0.0
+    noiseAmp = 0.5
 
     xAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 2 * t2) + np.sin(2 * np.pi * 3 * t2) + np.random.randn(SAMPLES) * noiseAmp)
     yAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 3 * t2) + np.sin(2 * np.pi * 5 * t2) + np.random.randn(SAMPLES) * noiseAmp)
@@ -173,9 +178,7 @@ if __name__ == "__main__":
 
     #axs = SetupGraphs(xAccel.tolist(), yAccel.tolist(), zAccel.tolist())
 
-    plt.ion()
     axs = SetupGraphs([],[],[])
-    plt.show(block=False)
 
     print(len(xAccel))
 
@@ -188,18 +191,17 @@ if __name__ == "__main__":
     
 
 
-##    startTime = time.time()
-##    index = 0
-##
-##    while time.time() < startTime + 16:
-##        if index >= len(xAccel):
-##            continue
-##
-##        GraphData(axs, xAccel[index], yAccel[index], zAccel[index])
-##
-##        index += 1
-##
-##        plt.pause(0.001)
+    startTime = time.time()
+    index = 0
+
+    while index < len(xAccel):
+        if index >= len(xAccel):
+            continue
+
+        GraphData(axs, xAccel[index], yAccel[index], zAccel[index])
+
+        index += 1
+
 
     #GraphData(axs, 1, 2, 3)
 
