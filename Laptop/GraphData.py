@@ -21,12 +21,12 @@ zRecent = []
 t = []
 
 FREQ = 24.0
-NUM_OF_REC_SAMPS = int(FREQ * 2)
+NUM_OF_REC_SAMPS = int(FREQ * 5)
 
 SAMPLES = int(FREQ * 15)
 
 
-TIME_BETWEEN_RENDERS = 0.5
+TIME_BETWEEN_RENDERS = 1
 samplesSinceLastRender = 0
 
 def _generate_array(n, TD):
@@ -134,6 +134,33 @@ def GraphData(axs, x, y, z):
     else:
         samplesSinceLastRender = 0
 
+
+        magX, freqX = FFT.FFT(xData, FREQ)
+        magY, freqY = FFT.FFT(xData, FREQ)
+        magZ, freqZ = FFT.FFT(xData, FREQ)
+
+        netMag, netFreq = FFT.removeLowerMags(np.sqrt(np.square(magX) + np.square(magY) + np.square(magZ)), freqX)
+        print(netMag)
+
+        axs[1,1].cla()
+
+        markLine, stemLine, _ = axs[1,1].stem(netFreq, netMag, label="X")
+    
+        #markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
+        #markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
+        #markLineZ, stemLineZ, _ = axs[1,1].stem(freqZ, magZ, label="Z")
+    #
+        #plt.setp(markLineX, color="red")
+        #plt.setp(stemLineX, color="red")
+    #
+        #plt.setp(markLineY, color="green")
+        #plt.setp(stemLineY, color="green")
+    #
+        #plt.setp(markLineZ, color="blue")
+        #plt.setp(stemLineZ, color="blue")
+
+
+
         linesRaw = axs[0,0].get_lines()
         linesRecent = axs[1,0].get_lines()
 
@@ -191,27 +218,7 @@ if __name__ == "__main__":
 
     axs = SetupGraphs([],[],[])
 
-    
-    magX, freqX = FFT.FFT(xAccel, FREQ)
-    magY, freqY = FFT.FFT(yAccel, FREQ)
-    magZ, freqZ = FFT.FFT(zAccel, FREQ)
 
-    markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
-    markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
-    markLineZ, stemLineZ, _ = axs[1,1].stem(freqZ, magZ, label="Z")
-
-    plt.setp(markLineX, color="red")
-    plt.setp(stemLineX, color="red")
-
-    plt.setp(markLineY, color="green")
-    plt.setp(stemLineY, color="green")
-
-    plt.setp(markLineZ, color="blue")
-    plt.setp(stemLineZ, color="blue")
-    
-
-
-    startTime = time.time()
     index = 0
 
     while index < len(xAccel):
