@@ -1,4 +1,3 @@
-
 #include <math.h> // need for truncating
 #include "Arduino_BMI270_BMM150.h" // the main library
 
@@ -7,15 +6,17 @@ struct pseudoArray
   float x;
   float y;
   float z;
+  bool newData;
 };
 
 pseudoArray IMUreader() 
 {
-  IMU.begin();
   pseudoArray position;
+  position.newData = false;
   if (IMU.accelerationAvailable()) 
   {
     IMU.readAcceleration(position.x, position.y, position.z); // getting the data
+    position.newData = true;
   }
 
   position.x = trunc((position.x*100) + 5000000); // editing the value to correct parameters

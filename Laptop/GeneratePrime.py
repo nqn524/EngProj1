@@ -1,3 +1,5 @@
+import random
+
 def GeneratePrime():
     n = random.randint(1000000,2147483647)
 
