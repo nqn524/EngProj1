@@ -1,8 +1,10 @@
 import random
 import math
+import GeneratePrime
+
 def GenerateKey():
-  p = GeneratePrime(1)
-  q = GeneratePrime(2)
+  p = GeneratePrime.GeneratePrime()
+  q = GeneratePrime.GeneratePrime()
   KeyN = p * q
   k = (p-1) * (q-1)
   
@@ -13,12 +15,6 @@ def GenerateKey():
       #Basically going randomly through suitable primes until one sticks
       
   KeyD = pow(KeyE, -1, k) #Functon performs modular inverse on KeyE (mod k) to find a suitable keyD
-  deleteMe = True
+  return KeyN, KeyE, KeyD
 
-def GeneratePrime(num):
-  if num == 1:
-    return 9345770617
-  elif num == 2:
-    return 6365097881
-  else:
-    return 0
+
