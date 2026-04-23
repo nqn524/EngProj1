@@ -4,13 +4,13 @@ def GenerateKey():
   KeyN = p * q
   k = (p-1) * (q-1)
   
-  KeyE = KeyN - 1
-  while (KeyE < 1) or ( gcd(keyE, k) != 1): #generating a suitable keyE
-      n = 5
-      keyE = GeneratePrime(i)
-      n = n+1 #Basically going randomly through suitable primes until one sticks
+  KeyE = 7
+  while ( math.gcd( KeyE, k) != 1): #generating a suitable keyE
+      KeyE = random.randint(1, KeyN)
+  
+      #Basically going randomly through suitable primes until one sticks
       
-  KeyD = pow(KeyE, -1, K) #Functon performs modular inverse on KeyE (mod k) to find a suitable keyD
+  KeyD = pow(KeyE, -1, k) #Functon performs modular inverse on KeyE (mod k) to find a suitable keyD
   deleteMe = True
 
 def GeneratePrime(num):
