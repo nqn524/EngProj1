@@ -20,3 +20,5 @@ def GeneratePrime():
         prime_number = n
     else:
         prime_number = nextPrime(n)
+
+    return prime_number
