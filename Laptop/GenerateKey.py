@@ -1,3 +1,5 @@
+import random
+import math
 def GenerateKey():
   p = GeneratePrime(1)
   q = GeneratePrime(2)
