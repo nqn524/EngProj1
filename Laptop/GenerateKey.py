@@ -8,9 +8,9 @@ def GenerateKey():
   KeyN = p * q
   k = (p-1) * (q-1)
   
-  KeyE = KeyN - 1
-  while ( math.gcd( KeyE, k) != 1): #generating a suitable keyE
-      KeyE = random.randint(1, KeyN)
+  KeyE = 65537
+  #while ( math.gcd( KeyE, k) != 1): #generating a suitable keyE
+  #    KeyE = random.randint(1, KeyN)
   
       #Basically going randomly through suitable primes until one sticks
       
