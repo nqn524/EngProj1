@@ -55,6 +55,7 @@ def SetupGraphs(x, y, z):
     yRecent = yData[-NUM_OF_REC_SAMPS:]
     zRecent = zData[-NUM_OF_REC_SAMPS:]
 
+
     t = _generate_array(n, 1.0/FREQ).tolist()
 
 
@@ -75,7 +76,6 @@ def SetupGraphs(x, y, z):
 
     axs[0,1].set_xlabel("Freq")
     #axs[0,1].set_ylabel("Amplitude")
-
 
 
     axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], xRecent, label="X", color="red")
@@ -134,13 +134,15 @@ def GraphData(axs, x, y, z):
     else:
         samplesSinceLastRender = 0
 
+        allData = np.array(xData)/3 + np.array(yData)/3 + np.array(zData)/3
 
-        magX, freqX = FFT.FFT(xData, FREQ)
-        magY, freqY = FFT.FFT(xData, FREQ)
-        magZ, freqZ = FFT.FFT(xData, FREQ)
+        ##magX, freqX = FFT.FFT(xData, FREQ)
+        ##magY, freqY = FFT.FFT(xData, FREQ)
+        ##magZ, freqZ = FFT.FFT(xData, FREQ)
 
-        netMag, netFreq = FFT.removeLowerMags(np.sqrt(np.square(magX) + np.square(magY) + np.square(magZ)), freqX)
-        print(netMag)
+        netMag, netFreq = FFT.FFT(allData, FREQ)
+        #print(netMag)
+        #print(netFreq)
 
         axs[1,1].cla()
 
@@ -158,7 +160,6 @@ def GraphData(axs, x, y, z):
     #
         #plt.setp(markLineZ, color="blue")
         #plt.setp(stemLineZ, color="blue")
-
 
 
         linesRaw = axs[0,0].get_lines()
@@ -213,6 +214,10 @@ if __name__ == "__main__":
     xAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 2 * t2) + np.sin(2 * np.pi * 3 * t2) + np.random.randn(SAMPLES) * noiseAmp)
     yAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 3 * t2) + np.sin(2 * np.pi * 5 * t2) + np.random.randn(SAMPLES) * noiseAmp)
     zAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 1.5 * t2) + np.sin(2 * np.pi * 2.5 * t2) + np.random.randn(SAMPLES) * noiseAmp)
+
+    #xAccel = np.arange(SAMPLES) - np.arange(SAMPLES)
+    #yAccel = np.arange(SAMPLES) - np.arange(SAMPLES)
+    #zAccel = np.arange(SAMPLES) - np.arange(SAMPLES)
 
     #axs = SetupGraphs(xAccel.tolist(), yAccel.tolist(), zAccel.tolist())
 
