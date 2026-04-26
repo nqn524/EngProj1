@@ -21,12 +21,12 @@ zRecent = []
 t = []
 
 FREQ = 24.0
-NUM_OF_REC_SAMPS = int(FREQ * 2)
+NUM_OF_REC_SAMPS = int(FREQ * 5)
 
 SAMPLES = int(FREQ * 15)
 
 
-TIME_BETWEEN_RENDERS = 0.5
+TIME_BETWEEN_RENDERS = 1
 samplesSinceLastRender = 0
 
 def _generate_array(n, TD):
@@ -34,7 +34,7 @@ def _generate_array(n, TD):
     t = start + np.arange(SAMPLES) * TD
     return t
 
-def SetupGraphs(x, y, z):
+def SetupGraphs(x, y, z, time):
     global xData
     global yData
     global zData
@@ -50,18 +50,17 @@ def SetupGraphs(x, y, z):
     xData = np.concatenate([np.linspace(0, 0, SAMPLES - len(x)), x]).tolist()
     yData = np.concatenate([np.linspace(0, 0, SAMPLES - len(y)), y]).tolist()
     zData = np.concatenate([np.linspace(0, 0, SAMPLES - len(z)), z]).tolist()
+    t = np.concatenate([np.linspace(0, 0, SAMPLES - len(t), time)]).tolist()
     
     xRecent = xData[-NUM_OF_REC_SAMPS:]
     yRecent = yData[-NUM_OF_REC_SAMPS:]
     zRecent = zData[-NUM_OF_REC_SAMPS:]
 
-    t = _generate_array(n, 1.0/FREQ).tolist()
-
 
     fig, axs = plt.subplots(2,2)
     
-    mng = plt.get_current_fig_manager()
-    mng.window.state('zoomed')
+    #mng = plt.get_current_fig_manager()
+    #mng.window.state('zoomed')
     
     # Create a single line and keep reference
     axs[0,0].plot(t, xData, label="X", color="red")
@@ -75,7 +74,6 @@ def SetupGraphs(x, y, z):
 
     axs[0,1].set_xlabel("Freq")
     #axs[0,1].set_ylabel("Amplitude")
-
 
 
     axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], xRecent, label="X", color="red")
@@ -95,7 +93,7 @@ def SetupGraphs(x, y, z):
     
     return axs
 
-def GraphData(axs, x, y, z):
+def GraphData(axs, x, y, z, time):
     global xData
     global yData
     global zData
@@ -125,7 +123,7 @@ def GraphData(axs, x, y, z):
     yRecent.append(y)
     zRecent.append(z)
 
-    t.append(t[-1] + 1.0/FREQ)
+    t.append(time)
 
     global samplesSinceLastRender
 
@@ -133,6 +131,34 @@ def GraphData(axs, x, y, z):
         samplesSinceLastRender += 1
     else:
         samplesSinceLastRender = 0
+
+        allData = np.array(xData)/3 + np.array(yData)/3 + np.array(zData)/3
+
+        ##magX, freqX = FFT.FFT(xData, FREQ)
+        ##magY, freqY = FFT.FFT(xData, FREQ)
+        ##magZ, freqZ = FFT.FFT(xData, FREQ)
+
+        netMag, netFreq = FFT.FFT(allData, FREQ)
+        #print(netMag)
+        #print(netFreq)
+
+        axs[1,1].cla()
+
+        markLine, stemLine, _ = axs[1,1].stem(netFreq, netMag, label="X")
+    
+        #markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
+        #markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
+        #markLineZ, stemLineZ, _ = axs[1,1].stem(freqZ, magZ, label="Z")
+    #
+        #plt.setp(markLineX, color="red")
+        #plt.setp(stemLineX, color="red")
+    #
+        #plt.setp(markLineY, color="green")
+        #plt.setp(stemLineY, color="green")
+    #
+        #plt.setp(markLineZ, color="blue")
+        #plt.setp(stemLineZ, color="blue")
+
 
         linesRaw = axs[0,0].get_lines()
         linesRecent = axs[1,0].get_lines()
@@ -187,31 +213,15 @@ if __name__ == "__main__":
     yAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 3 * t2) + np.sin(2 * np.pi * 5 * t2) + np.random.randn(SAMPLES) * noiseAmp)
     zAccel = (np.sin(2 * np.pi * 1 * t2) + np.sin(2 * np.pi * 1.5 * t2) + np.sin(2 * np.pi * 2.5 * t2) + np.random.randn(SAMPLES) * noiseAmp)
 
+    #xAccel = np.arange(SAMPLES) - np.arange(SAMPLES)
+    #yAccel = np.arange(SAMPLES) - np.arange(SAMPLES)
+    #zAccel = np.arange(SAMPLES) - np.arange(SAMPLES)
+
     #axs = SetupGraphs(xAccel.tolist(), yAccel.tolist(), zAccel.tolist())
 
     axs = SetupGraphs([],[],[])
 
-    
-    magX, freqX = FFT.FFT(xAccel, FREQ)
-    magY, freqY = FFT.FFT(yAccel, FREQ)
-    magZ, freqZ = FFT.FFT(zAccel, FREQ)
 
-    markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
-    markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
-    markLineZ, stemLineZ, _ = axs[1,1].stem(freqZ, magZ, label="Z")
-
-    plt.setp(markLineX, color="red")
-    plt.setp(stemLineX, color="red")
-
-    plt.setp(markLineY, color="green")
-    plt.setp(stemLineY, color="green")
-
-    plt.setp(markLineZ, color="blue")
-    plt.setp(stemLineZ, color="blue")
-    
-
-
-    startTime = time.time()
     index = 0
 
     while index < len(xAccel):
