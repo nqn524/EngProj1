@@ -34,7 +34,7 @@ def _generate_array(n, TD):
     t = start + np.arange(SAMPLES) * TD
     return t
 
-def SetupGraphs(x, y, z):
+def SetupGraphs(x, y, z, time):
     global xData
     global yData
     global zData
@@ -50,19 +50,17 @@ def SetupGraphs(x, y, z):
     xData = np.concatenate([np.linspace(0, 0, SAMPLES - len(x)), x]).tolist()
     yData = np.concatenate([np.linspace(0, 0, SAMPLES - len(y)), y]).tolist()
     zData = np.concatenate([np.linspace(0, 0, SAMPLES - len(z)), z]).tolist()
+    t = np.concatenate([np.linspace(0, 0, SAMPLES - len(t), time)]).tolist()
     
     xRecent = xData[-NUM_OF_REC_SAMPS:]
     yRecent = yData[-NUM_OF_REC_SAMPS:]
     zRecent = zData[-NUM_OF_REC_SAMPS:]
 
 
-    t = _generate_array(n, 1.0/FREQ).tolist()
-
-
     fig, axs = plt.subplots(2,2)
     
-    mng = plt.get_current_fig_manager()
-    mng.window.state('zoomed')
+    #mng = plt.get_current_fig_manager()
+    #mng.window.state('zoomed')
     
     # Create a single line and keep reference
     axs[0,0].plot(t, xData, label="X", color="red")
@@ -95,7 +93,7 @@ def SetupGraphs(x, y, z):
     
     return axs
 
-def GraphData(axs, x, y, z):
+def GraphData(axs, x, y, z, time):
     global xData
     global yData
     global zData
@@ -125,7 +123,7 @@ def GraphData(axs, x, y, z):
     yRecent.append(y)
     zRecent.append(z)
 
-    t.append(t[-1] + 1.0/FREQ)
+    t.append(time)
 
     global samplesSinceLastRender
 
