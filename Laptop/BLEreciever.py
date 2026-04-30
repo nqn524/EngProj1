@@ -6,8 +6,11 @@ DEVICE_NAME = "CUNT"
 CHAR_UUID = "2A56"
 
 q = queue.Queue()
+connected = False
 
 async def ble():
+    global connected
+    
     print("Scanning for BLE devices...")
     devices = await BleakScanner.discover()
 
@@ -23,6 +26,7 @@ async def ble():
         return
 
     print(f"Found device: {target.name} ({target.address})")
+    connected = True
 
     async with BleakClient(target.address) as client:
         print("Connected!")
@@ -30,6 +34,8 @@ async def ble():
         def handle_data(sender, data):
             x, y, z, t = ParseData(data.decode("utf-8"))
             q.put((x,y,z,t))
+            if __name__ == "__main__":
+                print(f"X: {x}, Y: {y}, Z: {z}, T: {t}")
 
         await client.start_notify(CHAR_UUID, handle_data)
 
@@ -54,3 +60,7 @@ def ParseData(data):
     t /= 1000
 
     return x, y, z, t
+
+
+if __name__ == "__main__":
+    asyncio.run(ble())

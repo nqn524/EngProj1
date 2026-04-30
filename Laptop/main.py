@@ -1,7 +1,9 @@
 import threading
 import asyncio
+from time import sleep
+
 from GraphData import SetupGraphs, GraphData, plt
-from BLEreciever import ble, q
+from BLEreciever import ble, q, connected
 
 startTime = -1
 
@@ -31,10 +33,18 @@ def plotting(axs):
         print("Plot error:", e)
 
 if __name__ == "__main__":
-    axs = SetupGraphs([], [], [], [])
+
+    q.put(None)
+    print(q.get())
 
     ble_thread = threading.Thread(target=start_ble, daemon=True);
     ble_thread.start();
 
-    plotting(axs)
-
+    sleep(10)
+    
+    if q.empty():
+        print("Failed connecting to client")
+        ble_thread
+    else:
+        axs = SetupGraphs([], [], [], [])
+        plotting(axs)
