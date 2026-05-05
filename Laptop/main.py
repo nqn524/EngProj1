@@ -6,6 +6,7 @@ import sys
 from GraphData import SetupGraphs, GraphData, plt
 from BLEreciever import ble, q, connected
 from GenerateKey import GenerateKey
+from WriteToFile import WriteToFile
 from ReadFile import ReadFile
 
 startTime = -1
@@ -37,6 +38,7 @@ def plotting(axs):
                 t -= startTime
                 print(f"X: {x}, Y: {y}, Z: {z}, time: {t}")
 
+                WriteToFile(x, y, z, t)
                 GraphData(axs, x, y, z, t)
                 #plt.pause(0.001)
     except Exception as e:
@@ -54,6 +56,7 @@ def main():
             else:
                 loading = True
                 filepath = sys.argv[i+1]
+
 
     ble_thread = threading.Thread(target=start_ble, daemon=True);
     ble_thread.start();
