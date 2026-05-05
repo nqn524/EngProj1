@@ -1,2 +1,2 @@
 def ReadFile(filename):
-  deleteMe = True
+  return [0], [0], [0], [0]

@@ -2,13 +2,16 @@ import asyncio
 from bleak import BleakScanner, BleakClient
 import queue
 
+from Decrypt import Decrypt
+
 DEVICE_NAME = "CUNT"
 CHAR_UUID = "2A56"
+SEND_UUID = "2A57"
 
 q = queue.Queue()
 connected = False
 
-async def ble():
+async def ble(KeyN, KeyE, KeyD):
     global connected
     
     print("Scanning for BLE devices...")
@@ -31,11 +34,16 @@ async def ble():
     async with BleakClient(target.address) as client:
         print("Connected!")
 
-        def handle_data(sender, data):
-            x, y, z, t = ParseData(data.decode("utf-8"))
-            q.put((x,y,z,t))
-            if __name__ == "__main__":
-                print(f"X: {x}, Y: {y}, Z: {z}, T: {t}")
+        async def handle_data(sender, data):
+            decor = data.decode("utf-8")
+            if decor == "GIVEKEY":
+                await client.write_gatt_char(SEND_UUID, str(f"{KeyN},{KeyE}").encode())
+                print(f"SentKey: {KeyN},{KeyE}")
+            else:
+                x, y, z, t = ParseData(decor, KeyN, KeyD)
+                q.put((x,y,z,t))
+                if __name__ == "__main__":
+                    print(f"X: {x}, Y: {y}, Z: {z}, T: {t}")
 
         await client.start_notify(CHAR_UUID, handle_data)
 
@@ -44,23 +52,33 @@ async def ble():
             await asyncio.sleep(1)
 
 
-def ParseData(data):
-    splitData = data.split(",")
-    x, y, z, t = float(splitData[0]), float(splitData[1]), float(splitData[2]), float(splitData[3])
+def ParseData(data, KeyN, KeyD):
+    try:
+        splitData = data.split(",")
+        x, y, z, t = int(splitData[0]), int(splitData[1]), int(splitData[2]), int(splitData[3])
+        #print(f"X: {x}, Y: {y}, Z: {z}, t: {t}")
 
-    x -= 5000000
-    x /= 100
+        x = float(Decrypt(x, KeyD, KeyN))
+        y = float(Decrypt(y, KeyD, KeyN))
+        z = float(Decrypt(z, KeyD, KeyN))
+        t = float(Decrypt(t, KeyD, KeyN))
 
-    y -= 5000000
-    y /= 100
+        x -= 5000000
+        x /= 100
 
-    z -= 5000000
-    z /= 100
+        y -= 5000000
+        y /= 100
 
-    t /= 1000
+        z -= 5000000
+        z /= 100
 
-    return x, y, z, t
+        t /= 1000
 
+        return x, y, z, t
+    except Exception as e:
+        print("err parse: ", e)
+        print()
+        return 0, 0, 0, 0
 
 if __name__ == "__main__":
     asyncio.run(ble())
