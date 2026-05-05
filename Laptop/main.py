@@ -4,12 +4,17 @@ from time import sleep
 
 from GraphData import SetupGraphs, GraphData, plt
 from BLEreciever import ble, q, connected
+from GenerateKey import GenerateKey
 
 startTime = -1
 
+KeyN = -1
+KeyE = -1
+KeyD = -1
+
 def start_ble():
     try:
-        asyncio.run(ble())
+        asyncio.run(ble(KeyN, KeyE, KeyD))
     except Exception as e:
         print("BLE error:", e)
 
@@ -33,9 +38,8 @@ def plotting(axs):
         print("Plot error:", e)
 
 if __name__ == "__main__":
-
-    q.put(None)
-    print(q.get())
+    KeyN, KeyE, KeyD = GenerateKey()
+    print((KeyN, KeyE, KeyD))
 
     ble_thread = threading.Thread(target=start_ble, daemon=True);
     ble_thread.start();

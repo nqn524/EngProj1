@@ -1,6 +1,4 @@
-KeyD = 56354
-KeyN = 984123
-
-def Decrypt(CipherText):
-    PlainText = pow(CipherText, KeyD, KeyN)
-    return PlainText
+def Decrypt(CipherText, KeyD, KeyN):
+  PlainText = pow(CipherText, KeyD, KeyN)
+  #print(f"{CipherText}    {PlainText}")
+  return PlainText
