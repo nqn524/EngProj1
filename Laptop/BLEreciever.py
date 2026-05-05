@@ -38,7 +38,7 @@ async def ble(KeyN, KeyE, KeyD):
             decor = data.decode("utf-8")
             if decor == "GIVEKEY":
                 await client.write_gatt_char(SEND_UUID, str(f"{KeyN},{KeyE}").encode())
-                print("SentKey")
+                print(f"SentKey: {KeyN},{KeyE}")
             else:
                 x, y, z, t = ParseData(decor, KeyN, KeyD)
                 q.put((x,y,z,t))
@@ -56,6 +56,7 @@ def ParseData(data, KeyN, KeyD):
     try:
         splitData = data.split(",")
         x, y, z, t = int(splitData[0]), int(splitData[1]), int(splitData[2]), int(splitData[3])
+        #print(f"X: {x}, Y: {y}, Z: {z}, t: {t}")
 
         x = float(Decrypt(x, KeyD, KeyN))
         y = float(Decrypt(y, KeyD, KeyN))

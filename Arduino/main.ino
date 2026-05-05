@@ -6,6 +6,7 @@ BLEService dataService("180C");
 BLEStringCharacteristic sendChat("2A56", BLERead | BLENotify, 96);
 BLEStringCharacteristic receChat("2A57", BLEWrite, 50);
 
+const bool PRINT = true;
 const int FREQ = 24;
 
 uint64_t PublicKeyN = 1;
@@ -20,8 +21,11 @@ struct pseudoArray
 };
 
 void setup() {
-  Serial.begin(9600);
-  while (!Serial); 
+  if (PRINT) {
+    Serial.begin(9600);
+    while (!Serial);
+  }
+
   SetupBLE();
   IMU.begin();
 }
@@ -32,8 +36,8 @@ void loop() {
   if (central) {
     bool keyRecieved = false;
 
-    Serial.println("Connected to: " + central.address());
-    Serial.println("Not subscribed");
+    println("Connected to: " + central.address());
+    println("Not subscribed");
 
     while (central.connected()) {
       if (sendChat.subscribed()) {
@@ -41,6 +45,7 @@ void loop() {
           pseudoArray accelData = IMUreader();
 
           if (accelData.newData) {
+            //println("Raw: " + String(accelData.x) + " " + String(accelData.y) + " " + String(accelData.z));
 
             char buffer[96];
             sprintf(
@@ -51,13 +56,13 @@ void loop() {
               (unsigned long long)Encrypt(accelData.z, PublicKeyE, PublicKeyN),
               (unsigned long long)Encrypt(millis(), PublicKeyE, PublicKeyN)
             );
-            Serial.println(buffer);
 
             String sentData = String(buffer);
+            //sentData = String(int(accelData.x)) + "," + String(int(accelData.y)) + "," + String(int(accelData.z)) + "," + String(millis());
 
             sendChat.writeValue(sentData);
 
-            Serial.println(sentData);
+            println(sentData);
           }
           delay(1000 / FREQ);
         }
@@ -92,14 +97,14 @@ void loop() {
 
             keyRecieved = true;
             
-            //char buffer[64];
-            //sprintf(
-            //  buffer,
-            //  "%llu, %llu",
-            //  (unsigned long long)PublicKeyN,
-            //  (unsigned long long)PublicKeyE
-            //);
-            //Serial.println(buffer);
+            char buffer[64];
+            sprintf(
+              buffer,
+              "%llu, %llu",
+              (unsigned long long)PublicKeyN,
+              (unsigned long long)PublicKeyE
+            );
+            println(buffer);
           }
           else {
             sendChat.writeValue("GIVEKEY");
@@ -109,13 +114,21 @@ void loop() {
       }
     }
 
-    Serial.println("Disconnected");
+    println("Disconnected");
+  }
+}
+
+void println(String data) {
+  if (PRINT) {
+    if (Serial) {
+      Serial.println(data);
+    }
   }
 }
 
 void SetupBLE() {
   if (!BLE.begin()) {
-    Serial.println("Starting BLE failed!");
+    println("Starting BLE failed!");
     while (1);
   }
 
@@ -131,7 +144,7 @@ void SetupBLE() {
 
   BLE.advertise();
 
-  Serial.println("BLE device is now advertising...");
+  println("BLE device is now advertising...");
 }
 
 pseudoArray IMUreader() 
