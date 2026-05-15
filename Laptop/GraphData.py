@@ -57,36 +57,29 @@ def SetupGraphs(x, y, z, time):
     zRecent = zData[-NUM_OF_REC_SAMPS:]
 
 
-    fig, axs = plt.subplots(2,2)
+    fig, axs = plt.subplots(3,2)
     
     #mng = plt.get_current_fig_manager()
     #mng.window.state('zoomed')
     
     # Create a single line and keep reference
-    axs[0,0].plot(t, xData, label="X", color="red")
-    axs[0,0].plot(t, yData, label="Y", color="green")
-    axs[0,0].plot(t, zData, label="Z", color="blue")
+    #axs[0,0].plot(t, xData, label="X", color="red")
+    #axs[0,0].plot(t, yData, label="Y", color="green")
+    #axs[0,0].plot(t, zData, label="Z", color="blue")
     
-    axs[0,0].set_xlabel("Time")
-    axs[0,0].set_ylabel("Amplitude")
-    axs[0,0].set_title("Raw data")
-    #axs[0,0].legend()
 
-    axs[0,1].set_xlabel("Freq")
-    #axs[0,1].set_ylabel("Amplitude")
-
-
-    axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], xRecent, label="X", color="red")
+    axs[0,0].plot(t[-NUM_OF_REC_SAMPS:], xRecent, label="X", color="red")
     axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], yRecent, label="Y", color="green")
-    axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], zRecent, label="Z", color="blue")
+    axs[2,0].plot(t[-NUM_OF_REC_SAMPS:], zRecent, label="Z", color="blue")
 
-    axs[1,0].set_xlabel("Time")
-    axs[1,0].set_ylabel("Amplitude")
-    axs[1,0].set_title("Last 10 seconds")
-    #axs[1,0].legend()
+    axs[0,0].set_ylabel("X")
 
-    axs[1,1].set_xlabel("Freq")
-    #axs[1,1].set_ylabel("Amplitude")
+    axs[1,0].set_ylabel("Y")
+
+    axs[2,0].set_xlabel("Time")
+    axs[2,0].set_ylabel("Z")
+
+    axs[2,1].set_xlabel("Frequency")
 
     plt.ion()
     plt.show(block=False)
@@ -134,52 +127,60 @@ def GraphData(axs, x, y, z, time):
 
         allData = np.array(xData)/3 + np.array(yData)/3 + np.array(zData)/3
 
-        ##magX, freqX = FFT.FFT(xData, FREQ)
-        ##magY, freqY = FFT.FFT(xData, FREQ)
-        ##magZ, freqZ = FFT.FFT(xData, FREQ)
-
-        netMag, netFreq = FFT.FFT(allData, FREQ)
-        #print(netMag)
-        #print(netFreq)
+        magX, freqX = FFT.FFT(xData, FREQ)
+        magY, freqY = FFT.FFT(xData, FREQ)
+        magZ, freqZ = FFT.FFT(xData, FREQ)
 
         axs[1,1].cla()
 
-        markLine, stemLine, _ = axs[1,1].stem(netFreq, netMag, label="X")
     
-        #markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
-        #markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
-        #markLineZ, stemLineZ, _ = axs[1,1].stem(freqZ, magZ, label="Z")
-    #
-        #plt.setp(markLineX, color="red")
-        #plt.setp(stemLineX, color="red")
-    #
-        #plt.setp(markLineY, color="green")
-        #plt.setp(stemLineY, color="green")
-    #
-        #plt.setp(markLineZ, color="blue")
-        #plt.setp(stemLineZ, color="blue")
+        markLineX, stemLineX, _ = axs[0,1].stem(freqX, magX, label="X")
+        markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
+        markLineZ, stemLineZ, _ = axs[2,1].stem(freqZ, magZ, label="Z")
+    
+        plt.setp(markLineX, color="red")
+        plt.setp(stemLineX, color="red")
+    
+        plt.setp(markLineY, color="green")
+        plt.setp(stemLineY, color="green")
+    
+        plt.setp(markLineZ, color="blue")
+        plt.setp(stemLineZ, color="blue")
 
 
-        linesRaw = axs[0,0].get_lines()
-        linesRecent = axs[1,0].get_lines()
+        #linesRaw = axs[0,0].get_lines()
+        #linesRecent = axs[1,0].get_lines()
 
-        linesRaw[0].set_ydata(xData)
-        linesRaw[1].set_ydata(yData)
-        linesRaw[2].set_ydata(zData)
+        linesX = axs[0,0].get_lines()
+        linesY = axs[1,0].get_lines()
+        linesZ = axs[2,0].get_lines()
 
-        linesRecent[0].set_ydata(xRecent)
-        linesRecent[1].set_ydata(yRecent)
-        linesRecent[2].set_ydata(zRecent)
+        #linesRaw[0].set_ydata(xData)
+        #linesRaw[1].set_ydata(yData)
+        #linesRaw[2].set_ydata(zData)
+
+        linesX[0].set_ydata(xRecent)
+        linesY[0].set_ydata(yRecent)
+        linesZ[0].set_ydata(zRecent)
+
+        #linesRecent[0].set_ydata(xRecent)
+        #linesRecent[1].set_ydata(yRecent)
+        #linesRecent[2].set_ydata(zRecent)
 
 
 
-        linesRaw[0].set_xdata(t)
-        linesRaw[1].set_xdata(t)
-        linesRaw[2].set_xdata(t)
+        #linesRaw[0].set_xdata(t)
+        #linesRaw[1].set_xdata(t)
+        #linesRaw[2].set_xdata(t)
 
-        linesRecent[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
-        linesRecent[1].set_xdata(t[-NUM_OF_REC_SAMPS:])
-        linesRecent[2].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        #linesRecent[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        #linesRecent[1].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        #linesRecent[2].set_xdata(t[-NUM_OF_REC_SAMPS:])
+
+        linesX[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        linesY[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
+        linesZ[0].set_xdata(t[-NUM_OF_REC_SAMPS:])
+
 
 
         axs[0,0].relim()
@@ -188,11 +189,21 @@ def GraphData(axs, x, y, z, time):
         axs[1,0].relim()
         axs[1,0].autoscale_view()
 
+        axs[2,0].relim()
+        axs[2,0].autoscale_view()
+
+
+
+
         axs[0,1].relim()
         axs[0,1].autoscale_view()
 
         axs[1,1].relim()
         axs[1,1].autoscale_view()
+
+        axs[2,1].relim()
+        axs[2,1].autoscale_view()
+
 
         plt.pause(0.001)
 
@@ -219,8 +230,7 @@ if __name__ == "__main__":
 
     #axs = SetupGraphs(xAccel.tolist(), yAccel.tolist(), zAccel.tolist())
 
-    axs = SetupGraphs([],[],[])
-
+    axs = SetupGraphs([],[],[],[])
 
     index = 0
 
@@ -228,7 +238,7 @@ if __name__ == "__main__":
         if index >= len(xAccel):
             continue
 
-        GraphData(axs, xAccel[index], yAccel[index], zAccel[index])
+        GraphData(axs, xAccel[index], yAccel[index], zAccel[index], t2[index])
 
         index += 1
 
