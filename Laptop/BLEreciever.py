@@ -8,7 +8,8 @@ DEVICE_NAME = "CUNT"
 CHAR_UUID = "2A56"
 SEND_UUID = "2A57"
 
-q = queue.Queue()
+receQ = queue.Queue()
+sendQ = queue.Queue()
 connected = False
 
 async def ble(KeyN, KeyE, KeyD):
@@ -41,14 +42,14 @@ async def ble(KeyN, KeyE, KeyD):
                 print(f"SentKey: {KeyN},{KeyE}")
             else:
                 x, y, z, t = ParseData(decor, KeyN, KeyD)
-                q.put((x,y,z,t))
-                if __name__ == "__main__":
-                    print(f"X: {x}, Y: {y}, Z: {z}, T: {t}")
+                receQ.put((x,y,z,t))    
 
         await client.start_notify(CHAR_UUID, handle_data)
 
         print("Listening for data... Press Ctrl+C to exit.")
         while True:
+            if not sendQ.empty():
+                await client.write_gatt_char(SEND_UUID, str(sendQ.get()).encode())
             await asyncio.sleep(1)
 
 

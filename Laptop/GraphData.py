@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import numpy as np
 import FFT
 import time
+import tkinter as tk
 
 # np.linspace(x, x + (n-1)*y, n)
 # x = start
@@ -9,6 +11,10 @@ import time
 # n = number of elements
 # 
 # Produces: [x, x + y, x + 2y, ..., x + (n-2)y, x + (n-1)y]
+
+plotX = True
+plotY = True
+plotZ = True
 
 xData = []
 yData = []
@@ -25,9 +31,10 @@ NUM_OF_REC_SAMPS = int(FREQ * 5)
 
 SAMPLES = int(FREQ * 15)
 
-
 TIME_BETWEEN_RENDERS = 1
 samplesSinceLastRender = 0
+
+canvas = None
 
 def _generate_array(n, TD):
     start = TD - (SAMPLES - n) * TD
@@ -44,6 +51,8 @@ def SetupGraphs(x, y, z, time):
     global zRecent
 
     global t
+
+    global canvas
 
     n = len(x)
     
@@ -75,7 +84,6 @@ def SetupGraphs(x, y, z, time):
     axs[0,1].set_xlabel("Freq")
     #axs[0,1].set_ylabel("Amplitude")
 
-
     axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], xRecent, label="X", color="red")
     axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], yRecent, label="Y", color="green")
     axs[1,0].plot(t[-NUM_OF_REC_SAMPS:], zRecent, label="Z", color="blue")
@@ -89,9 +97,20 @@ def SetupGraphs(x, y, z, time):
     #axs[1,1].set_ylabel("Amplitude")
 
     plt.ion()
-    plt.show(block=False)
+    #plt.show(block=False)
+
+    root = tk.Tk()
+
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+    toolbar = NavigationToolbar2Tk(canvas, root)
+    toolbar.update()
+    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
     
-    return axs
+    return axs, fig, root
 
 def GraphData(axs, x, y, z, time):
     global xData
@@ -134,17 +153,17 @@ def GraphData(axs, x, y, z, time):
 
         allData = np.array(xData)/3 + np.array(yData)/3 + np.array(zData)/3
 
-        ##magX, freqX = FFT.FFT(xData, FREQ)
-        ##magY, freqY = FFT.FFT(xData, FREQ)
-        ##magZ, freqZ = FFT.FFT(xData, FREQ)
+        magX, freqX = FFT.FFT(xData, FREQ)
+        #magY, freqY = FFT.FFT(xData, FREQ)
+        #magZ, freqZ = FFT.FFT(xData, FREQ)
 
-        netMag, netFreq = FFT.FFT(allData, FREQ)
+        #netMag, netFreq = FFT.FFT(allData, FREQ)
         #print(netMag)
         #print(netFreq)
 
         axs[1,1].cla()
 
-        markLine, stemLine, _ = axs[1,1].stem(netFreq, netMag, label="X")
+        markLine, stemLine, _ = axs[1,1].stem(freqX, magX, label="X")
     
         #markLineX, stemLineX, _ = axs[1,1].stem(freqX, magX, label="X")
         #markLineY, stemLineY, _ = axs[1,1].stem(freqY, magY, label="Y")
@@ -181,6 +200,21 @@ def GraphData(axs, x, y, z, time):
         linesRecent[1].set_xdata(t[-NUM_OF_REC_SAMPS:])
         linesRecent[2].set_xdata(t[-NUM_OF_REC_SAMPS:])
 
+        if not plotX:
+            print("not x")
+            linesRaw[0].set_xdata([0])
+            linesRaw[0].set_ydata([0])
+
+        if not plotY:
+            print("not y")
+            linesRaw[1].set_xdata([0])
+            linesRaw[1].set_ydata([0])
+
+        if not plotZ:
+            print("not z")
+            linesRaw[2].set_xdata([0])
+            linesRaw[2].set_ydata([0])
+
 
         axs[0,0].relim()
         axs[0,0].autoscale_view()
@@ -194,7 +228,8 @@ def GraphData(axs, x, y, z, time):
         axs[1,1].relim()
         axs[1,1].autoscale_view()
 
-        plt.pause(0.001)
+        canvas.draw_idle()
+        #plt.pause(0.001)
 
 
 
