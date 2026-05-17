@@ -59,8 +59,8 @@ def SetupGraphs(x, y, z, time):
 
     fig, axs = plt.subplots(3,2)
     
-    #mng = plt.get_current_fig_manager()
-    #mng.window.state('zoomed')
+    mng = plt.get_current_fig_manager()
+    mng.window.state('zoomed')
     
     # Create a single line and keep reference
     #axs[0,0].plot(t, xData, label="X", color="red")

@@ -6,11 +6,13 @@ BLEService dataService("180C");
 BLEStringCharacteristic sendChat("2A56", BLERead | BLENotify, 96);
 BLEStringCharacteristic receChat("2A57", BLEWrite, 50);
 
-const bool PRINT = true;
+const bool PRINT = false;
 const int FREQ = 24;
 
 uint64_t PublicKeyN = 1;
 uint64_t PublicKeyE = 1;
+
+bool record = true;
 
 struct pseudoArray
 {
@@ -44,8 +46,10 @@ void loop() {
         if (keyRecieved) {
           pseudoArray accelData = IMUreader();
 
-          if (accelData.newData) {
+          if (accelData.newData & record) {
             //println("Raw: " + String(accelData.x) + " " + String(accelData.y) + " " + String(accelData.z));
+
+            int time = millis();
 
             char buffer[96];
             sprintf(
@@ -54,7 +58,7 @@ void loop() {
               (unsigned long long)Encrypt(accelData.x, PublicKeyE, PublicKeyN),
               (unsigned long long)Encrypt(accelData.y, PublicKeyE, PublicKeyN),
               (unsigned long long)Encrypt(accelData.z, PublicKeyE, PublicKeyN),
-              (unsigned long long)Encrypt(millis(), PublicKeyE, PublicKeyN)
+              (unsigned long long)Encrypt(time, PublicKeyE, PublicKeyN)
             );
 
             String sentData = String(buffer);
@@ -62,7 +66,19 @@ void loop() {
 
             sendChat.writeValue(sentData);
 
-            println(sentData);
+            println("Raw: " + String((accelData.x - 5000000) / 100.0) + "," + String((accelData.y - 5000000) / 100.0) + "," + String((accelData.z - 5000000) / 100.0) + "," + String(time) + "    Encrypted: " + sentData);
+          }
+
+          if (receChat.written()) {
+            String raw = receChat.value();
+
+            if (raw == "start") {
+              record = true;
+            }
+
+            if (raw == "stop") {
+              record = false;
+            }
           }
           delay(1000 / FREQ);
         }

@@ -36,7 +36,7 @@ def plotting(axs):
                     startTime = t
 
                 t -= startTime
-                print(f"X: {x}, Y: {y}, Z: {z}, time: {t}")
+                #print(f"X: {x}, Y: {y}, Z: {z}, time: {t}")
 
                 WriteToFile(x, y, z, t)
                 GraphData(axs, x, y, z, t)

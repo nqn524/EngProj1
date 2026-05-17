@@ -42,8 +42,6 @@ async def ble(KeyN, KeyE, KeyD):
             else:
                 x, y, z, t = ParseData(decor, KeyN, KeyD)
                 q.put((x,y,z,t))
-                if __name__ == "__main__":
-                    print(f"X: {x}, Y: {y}, Z: {z}, T: {t}")
 
         await client.start_notify(CHAR_UUID, handle_data)
 
@@ -55,13 +53,13 @@ async def ble(KeyN, KeyE, KeyD):
 def ParseData(data, KeyN, KeyD):
     try:
         splitData = data.split(",")
-        x, y, z, t = int(splitData[0]), int(splitData[1]), int(splitData[2]), int(splitData[3])
-        #print(f"X: {x}, Y: {y}, Z: {z}, t: {t}")
+        xRaw, yRaw, zRaw, tRaw = int(splitData[0]), int(splitData[1]), int(splitData[2]), int(splitData[3])
+        
 
-        x = float(Decrypt(x, KeyD, KeyN))
-        y = float(Decrypt(y, KeyD, KeyN))
-        z = float(Decrypt(z, KeyD, KeyN))
-        t = float(Decrypt(t, KeyD, KeyN))
+        x = float(Decrypt(xRaw, KeyD, KeyN))
+        y = float(Decrypt(yRaw, KeyD, KeyN))
+        z = float(Decrypt(zRaw, KeyD, KeyN))
+        t = float(Decrypt(tRaw, KeyD, KeyN))
 
         x -= 5000000
         x /= 100
@@ -74,6 +72,8 @@ def ParseData(data, KeyN, KeyD):
 
         t /= 1000
 
+        #print(f"Decrypted: {x},{y},{z},{t}      Raw: {xRaw},{yRaw},{zRaw},{tRaw}")
+
         return x, y, z, t
     except Exception as e:
         print("err parse: ", e)
@@ -81,4 +81,4 @@ def ParseData(data, KeyN, KeyD):
         return 0, 0, 0, 0
 
 if __name__ == "__main__":
-    asyncio.run(ble())
+    asyncio.run(ble(1717955873332291651, 65537, 217860616767666689))
